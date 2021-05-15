@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<meta charset="UTF-8">
+<title>Ejemplo de petición con fetch</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<script>
+function ejecutarPetición(url){    
+    // En su forma más básica la función fetch toma la URL del recurso a obtener. También
+    // puede tomar un objeto de tipo Request que nos permite definir otros detalles como 
+    // pueden ser los encabezados
+    fetch(url)
+        // y retorna una promesa
+        .then(function(respuesta){
+            // Handler ejecutado cuando la promesa se cumpe. Se considera cumplida cuando la
+            // petición se pudo completar incluso con codigo de estado 404 o 500. Así, como 
+            // argumento del callback obtendremos un objeto de tipo Response (https://developer.mozilla.org/es/docs/Web/API/Response).
+            // Dicho objeto modela la respuesta HTTP
+            document.getElementById("resultado").innerHTML = "";
+            // Verificamos el código de estado de la respuesta
+            if(respuesta.status !== 200){            
+                document.getElementById("resultado").innerHTML = "La petición falló con código " + 
+                    respuesta.status + ". ";
+            }           
+            // Con el método text() de Response obtenemos otra promesa, que cuando se cumple,
+            // nos brinda el contenido del cuerpo de la respuesta
+            respuesta.text().then(function(text){
+                    document.getElementById("resultado").innerHTML +=  "El cuerpo de la respuesta es: " + text;
+                }).catch(function(error){
+                    document.getElementById("resultado").innerHTML += "No se pudo obtener el cuerpo de la respuesta";
+                });             
+        }).catch(function(error){
+            // Si la petición no se pudo completar por problemas de red o algún otro motivo,
+            // la promesa será rechazada
+            document.getElementById("resultado").innerHTML = "Se produjo el siguiente error " + 
+                error.message + ".";
+        });
+}
+</script>
+<body>
+    <h1>Ejemplo de petición con fetch</h1>
+    <p>
+        Las peticiones las haremos contra la API <a href="https://jsonplaceholder.typicode.com/">JSON Placeholder</a>. 
+        Esta es una API con datos de prueba que consumiremos. En particular, para este ejemplo emplearemos la URL
+        <a href="https://jsonplaceholder.typicode.com/todos">https://jsonplaceholder.typicode.com/todos</a> la cual
+        contiene un listado de tareas por realizar.
+    </p>
+    <p>
+        Por favor, abre las herramientas de desarrollador de tu navegador en el panel de red para inspeccionar las peticiones.    
+    </p>
+    <button onclick="ejecutarPetición('https://jsonplaceholder.typicode.com/todos')">Enviar petición</button>
+    <button onclick="ejecutarPetición('https://jsonplaceholder.typicode.com/xxxx')">Enviar petición que falla</button>
+    <pre id="resultado">El resultado de la petición aparecerá aquí. Observa que en ningún momento la página se refreca.
+    </pre>
+</body>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<meta charset="UTF-8">
+<title>Ejemplo de petición con XMLHttpRequest</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<script>
+function ejecutarPetición(url){
+    // Instanciamos el objeto XMLHttpRequest
+    var peticion = new XMLHttpRequest();
+    /*
+     Empezamos a generar la solicitud definiendo:
+       - el método
+       - la URL
+       - que la petición debe realizarse de forma asincrónica
+     */
+    peticion.open('GET', url, true);
+    /*
+     Luego registramos un manejador de eventos que se ejecuta cuando cambia
+     el valor de la propiedad readyState del objeto XMLHttpRequest. Esta
+     propiedad representa el estado de la petición y puede tomar los siguientes
+     valores:
+        - 0: aún no hemos llamado a la función open()
+        - 1: hemos llamado a la función open()
+        - 2: hemos enviado la petición (llamado al método send()) y hemos 
+          recibido ya el código de estado de la respuesta y sus headers
+        - 3: Se está obteniendo el cuerpo de la respuesta
+        - 4: se completó la petición y se obtuvo la respuesta
+     Dado que la petición se ejecuta de forma asincrónica, debemos registrar una
+     función que se ejecuta cuando el readyState de la petición se modifica.
+    */
+    peticion.onreadystatechange = function (evento) {
+        // Verificamos que el callback está siendo invocada porque la
+        // petición se completó
+        if (peticion.readyState == 4) {
+            // Verificamos que el código de estado HTTP sea 200
+            if(peticion.status == 200){
+                document.getElementById("resultado").innerHTML = peticion.responseText;
+            } else {
+                document.getElementById("resultado").innerHTML = "La petición falló con código " + 
+                    peticion.status + ". El cuerpo de la respuesta es: " + peticion.responseText;
+            }
+        }
+    };
+
+    /*
+     Finalmente enviamos la petición. El argumento aquí, especifica el cuerpo de 
+     la misma. Como aquí estamos haciendo una petición GET, no especificamos cuerpo.
+    */
+    peticion.send(null);     
+}
+</script>
+<body>
+    <h1>Ejemplo de petición con XMLHttpRequest</h1>
+    <p>
+        Las peticiones las haremos contra la API <a href="https://jsonplaceholder.typicode.com/">JSON Placeholder</a>. 
+        Esta es una API con datos de prueba que consumiremos. En particular, para este ejemplo emplearemos la URL
+        <a href="https://jsonplaceholder.typicode.com/todos">https://jsonplaceholder.typicode.com/todos</a> la cual
+        contiene un listado de tareas por realizar.
+    </p>
+    <p>
+        Por favor, abre las herramientas de desarrollador de tu navegador en el panel de red para inspeccionar las peticiones.    
+    </p>
+    <button onclick="ejecutarPetición('https://jsonplaceholder.typicode.com/todos')">Enviar petición</button>
+    <button onclick="ejecutarPetición('https://jsonplaceholder.typicode.com/xxxx')">Enviar petición que falla</button>
+    <pre id="resultado">El resultado de la petición aparecerá aquí. Observa que en ningún momento la página se refreca.
+    </pre>
+</body>
